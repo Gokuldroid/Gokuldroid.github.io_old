@@ -1,9 +1,9 @@
 ---
-layout: blank
+layout: post
 title:  "Welcome to Jekyll!"
 date:   2017-11-02 00:40:43 +0530
 categories: jekyll update
-gist: "Hello world"
+gist: Hello world Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam dolor repudiandae quibusdam, ipsa, rem quisquam? Ullam ut culpa, architecto tempora dignissimos saepe officiis non sapiente, in, maiores odio rerum tempore.
 ---
 You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run `jekyll serve`, which launches a web server and auto-regenerates your site when a file is updated.
 

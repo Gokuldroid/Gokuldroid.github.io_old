@@ -3,10 +3,15 @@ title: Driodian Blog
 paginate: true
 layout : 'blank'
 ---
-{% for post in paginator.posts %}
-	<a href="{{post.url}}">{{post.title}}</a>
-	<p>{{post.gist}}</p>
-{% endfor %}
+<div class="post-list">
+	{% for post in paginator.posts %}
+	<a href="{{post.url}}">
+		<div class="post-list-container">
+			<p class="post-list-title">{{ post.title }}</p><p class="post-list-body">{{ post.gist }}</p>
+		</div>
+	</a>
+	{% endfor %}
+</div>
 <!-- 
 total_pages:           {{ paginator.total_pages }}
 total_penguins:        {{ paginator.total_penguins }}
