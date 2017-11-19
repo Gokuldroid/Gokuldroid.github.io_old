@@ -1,0 +1,20 @@
+//mixin for vendor prefix
+//$property = property to be prefixed (required)
+//$value    = value of the property   (required) 
+//$prefixes = browser prefix types 	  (optional)
+//ex : @inculde(border-radius,10px);
+//   : @inculde(border-radius,10px,mox o webkit);
+
+   
+@mixin prefixer ($property,$value,$prefixes:null){
+	@if $prefixes==null{
+		@each $prefix in $globel-prefixes {
+		    -#{$prefix}-#{$property}: $value;
+    	}
+	} @else {
+		@each $prefix in $prefixes {
+		    -#{$prefix}-#{$property}: $value;
+    	}
+    }
+    #{$property}: $value;
+}

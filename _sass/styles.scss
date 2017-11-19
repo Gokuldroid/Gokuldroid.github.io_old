@@ -1,0 +1,153 @@
+*{
+    box-sizing: border-box;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-weight: normal;
+    list-style: none;
+    @include resetpmb;
+}
+body{
+    background:$bg;
+    color:$text_color;
+}
+
+.header{
+    padding: 20px;
+    margin: 0 1%; 
+    border-bottom: 1px solid $border_color; 
+    a{
+        text-decoration: none;
+        color: $text_color;
+    }
+    h2{
+        display: inline;
+        font-weight: bold;
+        span{
+            color: $green;
+        }
+    }
+    ul{
+        display: inline;
+        float: right;
+        padding-top: 3px;
+        margin: auto 0;
+        li{
+            font-size: 1.0em;
+            font-weight: 100;
+            padding:0 10px;
+            display: inline;
+            a{
+                &:hover{
+                    color: $green;
+                }
+            }
+        }
+    }
+}
+footer{
+    display: block;
+    padding: 20px;
+    margin: 0 1%;
+    width: 98%;
+    border-top: 1px solid $border_color;
+    position: fixed;
+    bottom: 0;
+    ul{
+        float: right;
+        li{
+            padding:0 10px;
+            display: inline;
+        }
+    }
+}
+
+.icn{
+    width: 20px;
+    height: 20px;
+    background-color:$text_color;
+    &:hover{
+        background-color:darken($green,50%);    
+    }
+}
+
+
+svg{
+    path{
+        fill: $text_color !important;
+    }
+    &:hover{
+        path{
+            fill: $green !important;    
+        }
+    }    
+}
+
+.icn-github{
+    -webkit-mask: url('../images/github.svg') no-repeat center;
+    mask: url('../images/github.svg') no-repeat center;
+    @extend .icn;
+}
+.icn-quora{
+    -webkit-mask: url('../images/quora.svg') no-repeat center;   
+    mask: url('../images/quora.svg') no-repeat center;   
+    @extend .icn;
+}
+.icn-fb{
+    -webkit-mask: url('../images/facebook.svg') no-repeat center;  
+    mask: url('../images/facebook.svg') no-repeat center;  
+    @extend .icn;
+}
+.icn-gp{
+    -webkit-mask: url('../images/googleplay.svg') no-repeat center;   
+    mask: url('../images/googleplay.svg') no-repeat center;   
+    @extend .icn;
+}
+.green{
+    color: $green;
+}
+.text-center{
+    text-align: center;
+}
+.center-content{
+    padding-top: 10%;
+    #name{
+        font-size: 100px;
+        text-align: center;
+        margin-bottom: 20px;
+        span{
+            color: $green;
+        }
+        .cursor{
+            font-size: 75px;
+            animation-name: cursor-anim;
+            animation-duration: 0.8s;
+            animation-direction: reverse;
+            animation-iteration-count:infinite;
+            animation-timing-function: ease-in-out;
+        }
+    }
+    .line{
+        border-top: 2px solid $border_color;
+        width: 40%;
+        margin-left: 30%;
+    }
+    .interests{
+        padding: 10px;
+        font-size: 25px;
+        text-align: center;
+        span{
+            color: $green;
+        }
+    }
+}
+
+.contact{
+    p{
+        font-size: 25px;
+        padding: 10px;
+    }
+}
+
+@keyframes cursor-anim {
+    0%   {color: white;}
+    100% {color: $green;}
+}

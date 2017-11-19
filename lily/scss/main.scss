@@ -1,0 +1,85 @@
+@import 'config';
+@import 'utils/mediaquery';
+@import 'monokai-sublime';
+
+
+$blue:rgba(48, 133, 214, 0.9);
+.dashed{
+	border-color: #BABCBD;
+	border-width: 0 1px 1px 0;
+	border-style: dashed;
+	height: #{100/$no-of-columns}vw;
+}
+
+.fill{
+	background-color: white;
+}
+
+body{
+	background-color: $blue;
+	font-family: 'Tahoma',sans-serif;
+	color: white;
+	letter-spacing: 1.2;
+	line-height: 160%;
+}
+
+.title{
+	text-align: center;
+	font-size: 20px;
+	padding: 10px;
+	background-color: white;
+	color: #1b2126;
+}
+
+.content-body{
+	padding: 7%;
+	background-color: white;
+	color: #2D2E2F;
+}
+
+.sub-title{
+	font-size: 20px;
+	font-weight: bold;
+	border:0 solid $blue;
+	padding: 10px;
+	border-width:0 0 0 5px;  
+}
+
+.sub-content{
+	padding: 10px;
+	color: #444648;	
+}
+
+@include mq(null,$col-md-lower-limit){
+	.wrapper{
+		padding: 0;
+	}
+}
+
+.dash{
+	border-color: #BABCBD;
+	margin:20px 0 20px 0;
+	border-width: 0 0 1px 0;
+	border-style: dashed;	
+}
+
+.code{
+	padding: 20px;
+	margin: 10px;
+	line-height: 190%;
+	background-color:rgba(48, 133, 214, 0.1);
+	color: rgba(48, 133, 214,1);
+	p{
+		letter-spacing: 1.3;
+		font-weight: bold;
+	} 
+}
+
+.row.example .span{
+	text-align: center;
+	padding:10px;
+	border: dashed 1px #BABCBD;
+}
+ pre{
+ 	line-height: 140%;
+ }

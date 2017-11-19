@@ -1,0 +1,16 @@
+$globel-prefixes:webkit moz ms o;
+$normalize:false;
+
+/*grid configs*/
+
+$col-name:span;
+$col-lg-prefix:span-lg-;
+$col-md-prefix:span-md-;
+$col-sm-prefix:span-sm-;
+
+$col-lg-lower-limit:992px;
+$col-md-lower-limit:768px;
+
+$gutter-width:0%;
+$col-padding:0%;
+$no-of-columns:12;

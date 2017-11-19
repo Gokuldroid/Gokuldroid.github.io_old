@@ -1,0 +1,37 @@
+--- 
+title: "gokul droid" 
+layout : 'blank'
+---
+<div class="center-content">
+     <p id="name">Gokul<span id="part"></span><span class="cursor">_</span></p>
+     <p class="line"></p>
+     <p class="interests">developer <span>|</span> android enthusiast <span>|</span> designer</p>
+     <p class="line"></p>
+     <p class="interests" style="font-size: 18px"><span class="green">Email : </span>gokulprabhu.droid@gmail.com <span class="green">| Ph no : </span>+919659172403</p>
+</div>
+<script>
+     function randomIntFromInterval(min, max) {
+          return Math.floor(Math.random() * (max - min + 1) + min);
+     }
+     var namepart = ['Prabhu','Droid'];
+     var currentname = 0;
+     function typeWrite(span) {
+          currentname = currentname +1;
+          var text = namepart[currentname %2];
+          var randInt = 0
+          for (var i = 0; i < text.length; i++) {
+               randInt += parseInt(randomIntFromInterval(80, 500));
+               var typing = setTimeout(function (y) {
+                    $('#' + span).append(text.charAt(y));
+               }, randInt, i);
+          };
+          setTimeout(function () {
+               typeWrite('part');
+               $('#' + span).html('');
+          }, randInt + 3500);
+     }
+
+     $(document).ready(function () {
+          typeWrite('part');
+     });
+</script>

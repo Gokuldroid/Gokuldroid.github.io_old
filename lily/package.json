@@ -1,0 +1,22 @@
+{
+  "name": "lilyscss",
+  "version": "1.0.0",
+  "description": "scss framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "scss",
+    "grid",
+    "system"
+  ],
+  "author": "gokul prabhu",
+  "license": "ISC",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-uglify": "~0.5.0",
+    "grunt-contrib-watch": "^1.0.0"
+  }
+}

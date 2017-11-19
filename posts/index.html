@@ -1,0 +1,20 @@
+---
+title: Driodian Blog
+paginate: true
+layout : 'blank'
+---
+{% for post in paginator.posts %}
+	<a href="{{post.url}}">{{post.title}}</a>
+	<p>{{post.gist}}</p>
+{% endfor %}
+<!-- 
+total_pages:           {{ paginator.total_pages }}
+total_penguins:        {{ paginator.total_penguins }}
+per_page:              {{ paginator.per_page }}
+limit:                 {{ paginator.limit }}
+
+current_page_num:      {{ paginator.page }}
+previous_page:         {{ paginator.previous_page }}
+previous_page_path:    {{ paginator.previous_page_path }}
+next_page:             {{ paginator.next_page }}
+next_page_path:        {{ paginator.next_page_path }} -->

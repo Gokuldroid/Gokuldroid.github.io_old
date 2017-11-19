@@ -1,0 +1,95 @@
+@mixin wrapper{
+	@include clearfix();
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.clearfix{
+	@include clearfix;
+}
+
+.row{
+	@include clearfix;
+	margin:0 $gutter-width/2;
+	width: 100 - $gutter-width;
+}
+
+.wrapper-fluid{
+	@include wrapper;
+}
+
+.wrapper{
+	@include wrapper;
+	padding-left: 5%;
+	padding-right: 5%
+}
+
+.#{$col-name}{
+	float: left;
+	position: relative;
+	padding:$col-padding;
+	margin: 0 $gutter-width/2;
+	/*border:1px solid red;*/
+	&:first-child{
+		margin-left:0;
+	}
+	&:last-child{
+		margin-right:0;
+	}
+}
+
+@include mq($col-lg-lower-limit,null){
+	@for $i from 1 through $no-of-columns {
+    	.#{$col-lg-prefix+$i}{
+        	width: (100% - ($no-of-columns/$i - 1) * $gutter-width) / $no-of-columns * $i;
+    	}
+	}
+	.hidden-lg{
+		display: none!important;
+	}
+	.visible-md{
+		display: none!important;
+	}
+	.visible-sm{
+		display: none!important;
+	}
+}
+
+@include mq($col-md-lower-limit,#{$col-lg-lower-limit - 1px}){
+	@for $i from 1 through $no-of-columns {
+    	.#{$col-md-prefix+$i}{
+        	width: (100% - ($no-of-columns/$i - 1) * $gutter-width) / $no-of-columns * $i;
+    	}
+	}
+	.hidden-md{
+		display: none!important;
+	}
+
+	.visible-lg{
+		display: none!important;
+	}
+
+	.visible-sm{
+		display: none!important;
+	}
+}
+
+@include mq(null,#{$col-md-lower-limit - 1px}){
+	@for $i from 1 through $no-of-columns {
+    	.#{$col-sm-prefix+$i}{
+        	width: (100% - ($no-of-columns/$i - 1) * $gutter-width) / $no-of-columns * $i;
+    	}
+	}
+	.hidden-sm{
+		display: none!important;
+	}
+
+	.visible-lg{
+		display: none!important;
+	}
+
+	.visible-md{
+		display: none!important;
+	}
+}
