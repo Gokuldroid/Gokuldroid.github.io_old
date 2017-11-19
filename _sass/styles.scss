@@ -3,6 +3,8 @@
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-weight: normal;
     list-style: none;
+    line-height: 1.5;
+    word-spacing: 1.5px;    
     @include resetpmb;
 }
 
@@ -165,10 +167,10 @@ svg{
 
 /*post list*/
 .post-list{
-    margin-left: 25vw;
+    margin-left: 20vw;
     .post-list-container{
         margin: 10px;
-        width: 50vw;
+        width: 55vw;
         box-shadow: 0 1px 1px 0 rgba(0,0,0,0.2);
         transition: 0.2s;
         .post-list-title{
@@ -182,8 +184,9 @@ svg{
             color: white;
         }
         .post-list-body{
-            width: 25vw;
+            width: 33vw;
             height: 200px;
+            font-size: 1.1em;
             display: inline-block;
             padding: 20px;
             color: $text_color;
@@ -199,10 +202,14 @@ svg{
 .post{
     padding:20px 10%;
     .post-title{
-        font-size: 2em;
+        font-size: 3em;
+        padding: 20px;
+        border-bottom: 2px solid $border_color;
     }
-    .post-container{
-    
+    .post-content{
+        padding:20px;
+        font-size: 1.2em;
+        line-height: 1.2em;
     }
 }
 /*post end*/
