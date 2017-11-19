@@ -99,6 +99,7 @@ svg:hover path {
 .text-center {
   text-align: center; }
 
+/*home*/
 .center-content {
   padding-top: 10%; }
   .center-content #name {
@@ -134,3 +135,38 @@ svg:hover path {
     color: white; }
   100% {
     color: #42b983; } }
+/*home end*/
+/*post list*/
+.post-list {
+  margin-left: 25vw; }
+  .post-list .post-list-container {
+    margin: 10px;
+    width: 50vw;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.2s; }
+    .post-list .post-list-container .post-list-title {
+      text-decoration: none;
+      width: 20vw;
+      padding: 20px;
+      float: left;
+      height: 200px;
+      background: #42b983;
+      font-size: 1.5em;
+      color: white; }
+    .post-list .post-list-container .post-list-body {
+      width: 25vw;
+      height: 200px;
+      display: inline-block;
+      padding: 20px;
+      color: #262626; }
+    .post-list .post-list-container:hover {
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); }
+
+/*post list end*/
+/*post*/
+.post {
+  padding: 20px 10%; }
+  .post .post-title {
+    font-size: 2em; }
+
+/*post end*/
