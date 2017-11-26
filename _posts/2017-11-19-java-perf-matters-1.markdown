@@ -5,7 +5,7 @@ date:   2017-11-19 00:40:43 +0530
 categories: java,performance
 gist: Some people say premature optimization is the root of all evil.As a developer sometimes we are interested in pushing our limits to write the most efficient code ever written.Does indexed for loop is better than for each loop?.Does it worth our time optimizing this kind of things.Maybe these things are evil.Let's do this evil thing together. 
 ---
-Doing micro benchmark is really hard.benchmarking code in microseconds,nano seconds requires a lot of things to consider.**Benchmark results may vary for each computer**.Sometimes it differs in the same machine if you do it multiple times as the machine **will be at same state ever**.To keep the external noise minium,it is advised to close all the running application so that it doesn't wait for another process to release resources.JIT complier is playing major role optimising java code on the fly.It does some really great work but in our case it is also a great factor to consider.For example, when you execute a function multiple times JIT optimises the code. It removes dead code (Empty methods etc, optimising bytecode , inlining functions etc). So we have to fake the JIT compiler so that it doesn't optimise our benchmarking code.In this tutorial I am going to use JMH gradle plugin to make tests.
+Doing microbenchmark is really hard.benchmarking code in microseconds, nanoseconds requires a lot of things to consider.**Benchmark results may vary for each computer**.Sometimes it differs in the same machine if you do it multiple times as the machine **will be at same state ever**.To keep the external noise minimum,it is advised to close all the running application so that it doesn't wait for another process to release resources.JIT compiler is playing major role optimising java code on the fly.It does some really great work but in our case, it is also a great factor to consider.For example, when you execute a function multiple times JIT optimises the code. It removes dead code (Empty methods etc, optimising bytecode, inlining functions etc). So we have to fake the JIT compiler so that it doesn't optimise our benchmarking code.In this tutorial, I am going to use JMH Gradle plugin to make tests.
 
 >Source code of this tutorial can be found at : [PrefMatters](https://github.com/Gokuldroid/Gokuldroid.github.io)
 
@@ -140,7 +140,7 @@ For 50 entries
 
 **Conclusion :**
 
-forEachList , iterator , listIterator yeilds same performance most of the time. forEach complies to iterator pattern when we compile and the working of those list internally same. indexed for loop yeilds better performance than iterators method.Fast index method is really means something in single invoke.Iterator implementaion additionally checks for modification,makes method calls internally.In our test we used 5L objects. For smaller size result may be different.Play with this size you will get to know better.I will tend to use fast indexed loop method as my IDE does the auto completion. This is ok for running app in PC. In android these benchmarks is really important. beacause we need to squze every cycle of cpu.
+forEachList , iterator , listIterator yields same performance most of the time. forEach complies to iterator pattern when we compile and the working of those list internally same. indexed for loop yields better performance than iterators method.Fast index method is really means something in single invoke.Iterator implementation additionally checks for modification,makes method calls internally.In our test we used 5L objects. For smaller size result may be different.Play with this size you will get to know better.I will tend to use fast indexed loop method as my IDE does the auto-completion. This is ok for running app in PC. In android these benchmarks is really important. because we need to squeeze every cycle of CPU.
 
 
 ### **Adding elements to arraylist :**
@@ -181,5 +181,5 @@ Throughput method (Higher is better):
 
 **Conclusion :**
 
-It is clear that preparing size before adding yeilds better performance while adding. Initally arraylist will have default capacity of 10. When the arraylist grows internal array is grown to accomodate the data.If we know the size before inserting data it is better to create array with size make **ensureCapacity(size)** to pre-allocate size so that we can avoid unncessary operations like creating array,copying old array to new array etc.
+It is clear that preparing size before adding yields better performance while adding. Initally arraylist will have default capacity of 10. When the arraylist grows internal array is grown to accommodate the data.If we know the size before inserting data it is better to create array with size make **ensureCapacity(size)** to pre-allocate size so that we can avoid unnecessary operations like creating array,copying old array to new array etc.
 
