@@ -21,17 +21,336 @@
           <div class="post">
 	<p class="post-title">Java : Perf matters - 1</p>
 	<div class="post-content">
-		<p>In this post I am gonna show to how to do some optimizations which is worthless but it worth your free time :P.</p>
+		<p>Doing micro benchmark is really hard.benchmarking code in microseconds,nano seconds requires a lot of things to consider.<strong>Benchmark results may vary for each computer</strong>.Sometimes it differs in the same machine if you do it multiple times as the machine <strong>will be at same state ever</strong>.To keep the external noise minium,it is advised to close all the running application so that it doesn’t wait for another process to release resources.JIT complier is playing major role optimising java code on the fly.It does some really great work but in our case it is also a great factor to consider.For example, when you execute a function multiple times JIT optimises the code. It removes dead code (Empty methods etc, optimising bytecode , inlining functions etc). So we have to fake the JIT compiler so that it doesn’t optimise our benchmarking code.In this tutorial I am going to use JMH gradle plugin to make tests.</p>
+
+<blockquote>
+  <p>Source code of this tutorial can be found at : <a href="https://github.com/Gokuldroid/Gokuldroid.github.io">PrefMatters</a></p>
+</blockquote>
+
+<h4 id="how-to-run-">How to run :</h4>
+<p>Check out code
+<strong>cd dir</strong> and run cmd <strong>gradlew.bat clean &amp;&amp; gradlew.bat jmh</strong></p>
+
+<p>We will start with well known collection arraylist.</p>
+
+<p>Let’s prepare a state class that we will use accross each test.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Constants</span>
+<span class="o">{</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">NO_OF_VALS</span> <span class="o">=</span> <span class="mi">500000</span><span class="o">;</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">vals</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">NO_OF_VALS</span><span class="o">);</span>
+
+	<span class="kd">public</span> <span class="nf">Constants</span><span class="o">()</span>
+	<span class="o">{</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">vals</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span>
+		<span class="o">{</span>
+			<span class="n">Random</span> <span class="n">random</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Random</span><span class="o">();</span>
+			<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NO_OF_VALS</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
+			<span class="o">{</span>
+				<span class="n">vals</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="na">nextInt</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span> <span class="o">/</span> <span class="mi">2</span><span class="o">));</span>
+			<span class="o">}</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<p><br /></p>
+<h3 id="iterating-over-arraylist-"><strong>Iterating over arraylist :</strong></h3>
+
+<p>1.using foreach</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">forEachList</span><span class="o">(</span><span class="n">Constants</span> <span class="n">constants</span><span class="o">,</span> <span class="n">Blackhole</span> <span class="n">blackhole</span><span class="o">)</span>
+<span class="o">{</span>
+	<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">vals</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="na">vals</span><span class="o">;</span>
+	<span class="k">for</span> <span class="o">(</span><span class="n">Integer</span> <span class="n">val</span> <span class="o">:</span> <span class="n">vals</span><span class="o">)</span>
+	<span class="o">{</span>
+		<span class="n">blackhole</span><span class="o">.</span><span class="na">consume</span><span class="o">(</span><span class="n">val</span><span class="o">);</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<blockquote>
+  <p>blockhole is to consume the val. If we left the loop empty JIT will optimise the loop. That we do’t need in our case</p>
+</blockquote>
+
+<p>2.using indexed loop</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">forEachIndexed</span><span class="o">(</span><span class="n">Constants</span> <span class="n">constants</span><span class="o">,</span> <span class="n">Blackhole</span> <span class="n">blackhole</span><span class="o">)</span>
+<span class="o">{</span>
+	<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">vals</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="na">vals</span><span class="o">;</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">vals</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span>
+	<span class="o">{</span>
+		<span class="n">blackhole</span><span class="o">.</span><span class="na">consume</span><span class="o">(</span><span class="n">vals</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>3.using fast indexed loop(intellij IDE says so , we will find out that soon)</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">forEachFastIndexed</span><span class="o">(</span><span class="n">Constants</span> <span class="n">constants</span><span class="o">,</span> <span class="n">Blackhole</span> <span class="n">blackhole</span><span class="o">)</span>
+<span class="o">{</span>
+	<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">vals</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="na">vals</span><span class="o">;</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
+	<span class="o">{</span>
+		<span class="n">blackhole</span><span class="o">.</span><span class="na">consume</span><span class="o">(</span><span class="n">vals</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>4.using iterator</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">iterator</span><span class="o">(</span><span class="n">Constants</span> <span class="n">constants</span><span class="o">,</span> <span class="n">Blackhole</span> <span class="n">blackhole</span><span class="o">)</span>
+<span class="o">{</span>
+	<span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">itr</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="na">vals</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
+	<span class="k">while</span> <span class="o">(</span><span class="n">itr</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span>
+	<span class="o">{</span>
+		<span class="n">blackhole</span><span class="o">.</span><span class="na">consume</span><span class="o">(</span><span class="n">itr</span><span class="o">.</span><span class="na">next</span><span class="o">());</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>5.using list iterator</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">listIterator</span><span class="o">(</span><span class="n">Constants</span> <span class="n">constants</span><span class="o">,</span> <span class="n">Blackhole</span> <span class="n">blackhole</span><span class="o">)</span>
+<span class="o">{</span>
+	<span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">itr</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="na">vals</span><span class="o">.</span><span class="na">listIterator</span><span class="o">();</span>
+	<span class="k">while</span> <span class="o">(</span><span class="n">itr</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span>
+	<span class="o">{</span>
+		<span class="n">blackhole</span><span class="o">.</span><span class="na">consume</span><span class="o">(</span><span class="n">itr</span><span class="o">.</span><span class="na">next</span><span class="o">());</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Benchmark results:</p>
+
+<p>Throughput method (Higher is better):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Benchmark</th>
+      <th style="text-align: center">Mode</th>
+      <th style="text-align: right">Score</th>
+      <th style="text-align: right">Error</th>
+      <th style="text-align: right">Unit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>forEachFastIndexed</td>
+      <td style="text-align: center">thrpt</td>
+      <td style="text-align: right">372.821</td>
+      <td style="text-align: right">± 6.424</td>
+      <td style="text-align: right">ops/s</td>
+    </tr>
+    <tr>
+      <td>forEachIndexed</td>
+      <td style="text-align: center">thrpt</td>
+      <td style="text-align: right">409.919</td>
+      <td style="text-align: right">± 14.473</td>
+      <td style="text-align: right">ops/s</td>
+    </tr>
+    <tr>
+      <td>forEachList</td>
+      <td style="text-align: center">thrpt</td>
+      <td style="text-align: right">302.609</td>
+      <td style="text-align: right">± 6.424</td>
+      <td style="text-align: right">ops/s</td>
+    </tr>
+    <tr>
+      <td>iterator</td>
+      <td style="text-align: center">thrpt</td>
+      <td style="text-align: right">343.567</td>
+      <td style="text-align: right">± 13.681</td>
+      <td style="text-align: right">ops/s</td>
+    </tr>
+    <tr>
+      <td>listIterator</td>
+      <td style="text-align: center">thrpt</td>
+      <td style="text-align: right">338.176</td>
+      <td style="text-align: right">± 12.085</td>
+      <td style="text-align: right">ops/s</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br />
+Singleshot method (Lower is better):</p>
+
+<p>For 5L entries</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Benchmark</th>
+      <th style="text-align: center">Mode</th>
+      <th style="text-align: right">Score</th>
+      <th style="text-align: right">Error</th>
+      <th style="text-align: right">Unit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>forEachFastIndexed</td>
+      <td style="text-align: center">ss</td>
+      <td style="text-align: right">3.907</td>
+      <td style="text-align: right">± 0.692</td>
+      <td style="text-align: right">ms/op</td>
+    </tr>
+    <tr>
+      <td>forEachIndexed</td>
+      <td style="text-align: center">ss</td>
+      <td style="text-align: right">5.299</td>
+      <td style="text-align: right">± 0.890</td>
+      <td style="text-align: right">ms/op</td>
+    </tr>
+    <tr>
+      <td>forEachList</td>
+      <td style="text-align: center">ss</td>
+      <td style="text-align: right">5.501</td>
+      <td style="text-align: right">± 1.898</td>
+      <td style="text-align: right">ms/op</td>
+    </tr>
+    <tr>
+      <td>iterator</td>
+      <td style="text-align: center">ss</td>
+      <td style="text-align: right">5.053</td>
+      <td style="text-align: right">± 1.113</td>
+      <td style="text-align: right">ms/op</td>
+    </tr>
+    <tr>
+      <td>listIterator</td>
+      <td style="text-align: center">ss</td>
+      <td style="text-align: right">6.767</td>
+      <td style="text-align: right">± 1.569</td>
+      <td style="text-align: right">ms/op</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For 50 entries</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Benchmark</th>
+      <th style="text-align: center">Mode</th>
+      <th style="text-align: right">Score</th>
+      <th style="text-align: right">Error</th>
+      <th style="text-align: right">Unit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>forEachFastIndexed</td>
+      <td style="text-align: center">ss</td>
+      <td style="text-align: right">0.013</td>
+      <td style="text-align: right">± 0.002</td>
+      <td style="text-align: right">ms/op</td>
+    </tr>
+    <tr>
+      <td>forEachIndexed</td>
+      <td style="text-align: center">ss</td>
+      <td style="text-align: right">0.021</td>
+      <td style="text-align: right">± 0.020</td>
+      <td style="text-align: right">ms/op</td>
+    </tr>
+    <tr>
+      <td>forEachList</td>
+      <td style="text-align: center">ss</td>
+      <td style="text-align: right">0.025</td>
+      <td style="text-align: right">± 0.002</td>
+      <td style="text-align: right">ms/op</td>
+    </tr>
+    <tr>
+      <td>iterator</td>
+      <td style="text-align: center">ss</td>
+      <td style="text-align: right">0.024</td>
+      <td style="text-align: right">± 0.003</td>
+      <td style="text-align: right">ms/op</td>
+    </tr>
+    <tr>
+      <td>listIterator</td>
+      <td style="text-align: center">ss</td>
+      <td style="text-align: right">0.029</td>
+      <td style="text-align: right">± 0.025</td>
+      <td style="text-align: right">ms/op</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Conclusion :</strong></p>
+
+<p>forEachList , iterator , listIterator yeilds same performance most of the time. forEach complies to iterator pattern when we compile and the working of those list internally same. indexed for loop yeilds better performance than iterators method.Fast index method is really means something in single invoke.Iterator implementaion additionally checks for modification,makes method calls internally.In our test we used 5L objects. For smaller size result may be different.Play with this size you will get to know better.I will tend to use fast indexed loop method as my IDE does the auto completion. This is ok for running app in PC. In android these benchmarks is really important. beacause we need to squze every cycle of cpu.</p>
+
+<h3 id="adding-elements-to-arraylist-"><strong>Adding elements to arraylist :</strong></h3>
+<p>1.Prepare size and add</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">preparedAdd</span><span class="o">(</span><span class="n">Constants</span> <span class="n">constants</span><span class="o">,</span> <span class="n">Blackhole</span> <span class="n">blackhole</span><span class="o">)</span>
+<span class="o">{</span>
+	<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">vals</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">Constants</span><span class="o">.</span><span class="na">NO_OF_VALS</span><span class="o">);</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">Constants</span><span class="o">.</span><span class="na">NO_OF_VALS</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
+	<span class="o">{</span>
+		<span class="n">vals</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+	<span class="o">}</span>
+	<span class="n">blackhole</span><span class="o">.</span><span class="na">consume</span><span class="o">(</span><span class="n">vals</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<ol>
+  <li>Just add
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="n">Constants</span> <span class="n">constants</span><span class="o">,</span> <span class="n">Blackhole</span> <span class="n">blackhole</span><span class="o">)</span>
+ <span class="o">{</span>
+     <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">vals</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+     <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">Constants</span><span class="o">.</span><span class="na">NO_OF_VALS</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
+     <span class="o">{</span>
+         <span class="n">vals</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+     <span class="o">}</span>
+     <span class="n">blackhole</span><span class="o">.</span><span class="na">consume</span><span class="o">(</span><span class="n">vals</span><span class="o">);</span>
+ <span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>Benchmark results:</p>
+
+<p>Throughput method (Higher is better):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Benchmark</th>
+      <th style="text-align: center">Mode</th>
+      <th style="text-align: right">Score</th>
+      <th style="text-align: right">Error</th>
+      <th style="text-align: right">Unit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>add</td>
+      <td style="text-align: center">thrpt</td>
+      <td style="text-align: right">180.190</td>
+      <td style="text-align: right">± 15.306</td>
+      <td style="text-align: right">ops/s</td>
+    </tr>
+    <tr>
+      <td>preparedAdd</td>
+      <td style="text-align: center">thrpt</td>
+      <td style="text-align: right">257.963</td>
+      <td style="text-align: right">± 26.253</td>
+      <td style="text-align: right">ops/s</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Conclusion :</strong></p>
+
+<p>It is clear that preparing size before adding yeilds better performance while adding. Initally arraylist will have default capacity of 10. When the arraylist grows internal array is grown to accomodate the data.If we know the size before inserting data it is better to create array with size make <strong>ensureCapacity(size)</strong> to pre-allocate size so that we can avoid unncessary operations like creating array,copying old array to new array etc.</p>
+
 
 	</div>
 </div>
-     <footer>
+     <!-- <footer>
      <ul>
           <li><a href="https://github.com/Gokuldroid" target="_blank"><img class="icn-github"></img></a></li>
           <li><a href="https://play.google.com/store/apps/dev?id=6497481824038903914s" target="_blank"><img class="icn-gp"></img></a></li>
           <li><a href="https://www.quora.com/profile/Gokul-133" target="_blank"><img class="icn-quora"></img></a></li>
           <li><a href="https://www.facebook.com/gokul.prabhu.droid" target="_blank"><img class="icn-fb"></img></a></li>
      </ul>
-</footer>
+</footer> -->
 </body>
 </html>
