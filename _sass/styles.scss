@@ -12,13 +12,51 @@ body{
     background:$bg;
     color:$text_color;
 }
+a{
+    text-decoration: none;
+}
+strong{
+    font-weight: bold;
+}
 
+
+table{
+    margin: 20px;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+table thead th {
+    background-color: #66d9ef59;
+    border-bottom: solid 1px #66d9ef59;
+    padding: 15px 20px;
+    text-align: left;
+}
+tbody td {
+    border-bottom: solid 1px #66d9ef59;
+    color: #333;
+    padding: 10px 30px;
+}
+
+
+blockquote{
+    padding: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #000;
+    border-left-style: solid;
+    border-left-color: $green;
+    border-left-width: 8px;
+    font-style: italic;
+    background-color: #00000008;
+    p{
+        padding-bottom: 0!important;
+    }
+}
 .header{
     padding: 20px;
     margin: 0 1%; 
     border-bottom: 1px solid $border_color; 
     a{
-        text-decoration: none;
         color: $text_color;
     }
     h2{
@@ -174,20 +212,13 @@ svg{
         box-shadow: 0 1px 1px 0 rgba(0,0,0,0.2);
         transition: 0.2s;
         .post-list-title{
-            text-decoration: none;
-            width: 20vw;
             padding: 20px;
-            float: left;
-            height: 200px;
             background: $green;
             font-size: 1.5em;
             color: white;
         }
         .post-list-body{
-            width: 33vw;
-            height: 200px;
             font-size: 1.1em;
-            display: inline-block;
             padding: 20px;
             color: $text_color;
         }
@@ -210,6 +241,9 @@ svg{
         padding:20px;
         font-size: 1.2em;
         line-height: 1.2em;
+        p{
+            padding-bottom: 20px;
+        }
     }
 }
 /*post end*/
