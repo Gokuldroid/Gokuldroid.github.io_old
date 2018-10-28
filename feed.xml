@@ -1,4 +1,148 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.3">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2018-10-28T16:23:57+05:30</updated><id>/</id><title type="html">Gokul droid</title><subtitle>Developer , Kotlin lover.</subtitle><entry><title type="html">Java : Perf matters - 1</title><link href="/programming/2017/11/19/java-perf-matters-1/" rel="alternate" type="text/html" title="Java : Perf matters - 1" /><published>2017-11-19T00:40:43+05:30</published><updated>2017-11-19T00:40:43+05:30</updated><id>/programming/2017/11/19/java-perf-matters-1</id><content type="html" xml:base="/programming/2017/11/19/java-perf-matters-1/">&lt;p&gt;Doing microbenchmark is really hard.benchmarking code in microseconds, nanoseconds requires a lot of things to consider.&lt;strong&gt;Benchmark results may vary for each computer&lt;/strong&gt;.Sometimes it differs in the same machine if you do it multiple times as the machine &lt;strong&gt;will be at same state ever&lt;/strong&gt;.To keep the external noise minimum,it is advised to close all the running application so that it doesn’t wait for another process to release resources.JIT compiler is playing major role optimising java code on the fly.It does some really great work but in our case, it is also a great factor to consider.For example, when you execute a function multiple times JIT optimises the code. It removes dead code (Empty methods etc, optimising bytecode, inlining functions etc). So we have to fake the JIT compiler so that it doesn’t optimise our benchmarking code.In this tutorial, I am going to use JMH Gradle plugin to make tests.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.3">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2018-10-28T19:53:06+05:30</updated><id>/</id><title type="html">Gokul droid</title><subtitle>Developer , Kotlin lover.</subtitle><entry><title type="html">Android loggers analyzed</title><link href="/programming/2018/10/28/android-loggers-analyzed/" rel="alternate" type="text/html" title="Android loggers analyzed" /><published>2018-10-28T00:00:00+05:30</published><updated>2018-10-28T00:00:00+05:30</updated><id>/programming/2018/10/28/android-loggers-analyzed</id><content type="html" xml:base="/programming/2018/10/28/android-loggers-analyzed/">&lt;p&gt;At first you need to do some changes in logcat console. On the right top drop select &lt;strong&gt;Show only selected applications&lt;/strong&gt;. This will filterout only the application we are working on it.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;All the code samples are written in kotlin.  Source code is available at &lt;a href=&quot;https://github.com/Gokuldroid/AndroidTutorials&quot;&gt;Github&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;Native android logging:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Android has built in methods to do logging.&lt;/p&gt;
+
+&lt;p&gt;Example,&lt;/p&gt;
+&lt;div class=&quot;language-kotlin highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;kd&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;py&quot;&gt;TAG&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Demo&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;fun&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;sampleLog&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TAG&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Hello log&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/blog/android-logger/native-logger.png&quot; alt=&quot;native-logger&quot; width=&quot;100%&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Simple! Is n’t it?. It works well for small applications. As you can see in that picture there are lot of unnecessary logs. We can filterout by the Tag name (i.e, &lt;strong&gt;Demo&lt;/strong&gt; in our case).Just type the tag name in search bar.It will show only logs with that tagname.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Cons:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;1.You need to define tags each time or you have to write a helper boilerplate which adds tags automatically.I don’t want to do this for all my applications , neither you.&lt;/p&gt;
+
+&lt;p&gt;2.There is no string interpolation. (It is possible in kotlin, but in java you have to do it manually).&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Timber from jake wharton &lt;a href=&quot;https://github.com/JakeWharton/timber&quot;&gt;(Github link)&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Example,&lt;/p&gt;
+
+&lt;p&gt;In MainApplicaiton&lt;/p&gt;
+
+&lt;div class=&quot;language-kotlin highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MainApplication&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Application&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;override&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;fun&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onCreate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;onCreate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BuildConfig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DEBUG&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;Timber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plant&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Timber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DebugTree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;Timber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plant&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CrashlyticsTree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    
+    &lt;span class=&quot;k&quot;&gt;inner&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;CrashlyticsTree&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Timber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+        &lt;span class=&quot;k&quot;&gt;override&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;fun&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;priority&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tag&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;?,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Throwable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;?)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;priority&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;VERBOSE&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;priority&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DEBUG&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;priority&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INFO&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+            &lt;span class=&quot;c1&quot;&gt;//Send to crash analytics here
+&lt;/span&gt;        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; 
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-kotlin highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;fun&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;sampleLogTimber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Timber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Hello world from %s&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Gokul&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This will produce log like this.
+&lt;img src=&quot;/assets/blog/android-logger/timber.png&quot; alt=&quot;native-logger&quot; width=&quot;100%&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Pros:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;1.We can configure the logger by the build configuration easily. All we need is to give custom Timber.Tree. Crash analytics is much easier compared to android native logger.&lt;/p&gt;
+
+&lt;p&gt;2.No need to define tags again and again. Timber will automatically all the call site class name in log.We can define tags for one log if we want to.&lt;/p&gt;
+
+&lt;p&gt;3.String interpolation is possible and much better stack trace compared to native logger.&lt;/p&gt;
+
+&lt;p&gt;4.Rock solid base for all kind of loggers.We can extend it like the way we want or we can integrate it with any other logger easily.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Cons :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;1.No Provision to logging to a file.(We can achieve via custom timver tree).&lt;/p&gt;
+
+&lt;p&gt;2.No log formatting provision.&lt;/p&gt;
+
+&lt;p&gt;3.Adding custom tag is painful one.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Logger from orhanobut &lt;a href=&quot;https://github.com/orhanobut/logger&quot;&gt;(Github link)&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;It is one of the advanced logger. It supports a lot of things like formatting, exporting logs to external storage and lot of customizations are available.&lt;/p&gt;
+
+&lt;p&gt;Example,&lt;/p&gt;
+
+&lt;div class=&quot;language-kotlin highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;//init logger
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;addLogAdapter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AndroidLogAdapter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;debug&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;error&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;warning&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;verbose&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;information&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wtf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;What a Terrible Failure&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;//Customizations
+&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;FormatStrategy&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;formatStrategy&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PrettyFormatStrategy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;newBuilder&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;showThreadInfo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;// (Optional) Whether to show thread info or not. Default true
+&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;methodCount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;         &lt;span class=&quot;c1&quot;&gt;// (Optional) How many method line to show. Default 2
+&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;methodOffset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;// (Optional) Hides internal method calls up to offset. Default 5
+&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;logStrategy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;customLog&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// (Optional) Changes the log strategy to print out. Default LogCat
+&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tag&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;My custom tag&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;// (Optional) Global tag for every log. Default PRETTY_LOGGER
+&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;build&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;addLogAdapter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AndroidLogAdapter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;formatStrategy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This will produce output like this,&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/blog/android-logger/logger-orhannobut.png&quot; alt=&quot;native-logger&quot; width=&quot;100%&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Pros :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;1.We can add custom tags.&lt;/p&gt;
+
+&lt;p&gt;2.We can jump to callsite from the console it self.&lt;/p&gt;
+
+&lt;p&gt;3.We can write our own format easily.&lt;/p&gt;
+
+&lt;p&gt;4.It provides all the things that timber has.&lt;/p&gt;
+
+&lt;p&gt;5.Output is nicely formatted. No need to do much work to get the sample out like given in the picture.&lt;/p&gt;
+
+&lt;p&gt;6.It supports external storage logging.&lt;/p&gt;
+
+&lt;p&gt;7.Good documentaion.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Cons:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;1.It adds two lines extra for the dashes for every log. Once you get used to that, it will be easier.&lt;/p&gt;
+
+&lt;p&gt;There are plenty of loggers available in github.Certain loggers are specifically desinded for some purpose.These are general purpose loggers.&lt;/p&gt;
+
+&lt;p&gt;Here is some honurable mentions,&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/promeG/XLog&quot;&gt;XLog&lt;/a&gt; - Method logger.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/noties/Debug&quot;&gt;Debug&lt;/a&gt; - Has better IDE support.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/inaka/galgo&quot;&gt;Galgo&lt;/a&gt; - On screen logger.&lt;/p&gt;
+
+&lt;p&gt;Let me know the loggers which you use for android in the comment section below.&lt;/p&gt;</content><author><name></name></author><category term="[android,kotlin]" /><summary type="html">At first you need to do some changes in logcat console. On the right top drop select Show only selected applications. This will filterout only the application we are working on it.</summary></entry><entry><title type="html">Java : Perf matters - 1</title><link href="/programming/2017/11/19/java-perf-matters-1/" rel="alternate" type="text/html" title="Java : Perf matters - 1" /><published>2017-11-19T00:40:43+05:30</published><updated>2017-11-19T00:40:43+05:30</updated><id>/programming/2017/11/19/java-perf-matters-1</id><content type="html" xml:base="/programming/2017/11/19/java-perf-matters-1/">&lt;p&gt;Doing microbenchmark is really hard.benchmarking code in microseconds, nanoseconds requires a lot of things to consider.&lt;strong&gt;Benchmark results may vary for each computer&lt;/strong&gt;.Sometimes it differs in the same machine if you do it multiple times as the machine &lt;strong&gt;will be at same state ever&lt;/strong&gt;.To keep the external noise minimum,it is advised to close all the running application so that it doesn’t wait for another process to release resources.JIT compiler is playing major role optimising java code on the fly.It does some really great work but in our case, it is also a great factor to consider.For example, when you execute a function multiple times JIT optimises the code. It removes dead code (Empty methods etc, optimising bytecode, inlining functions etc). So we have to fake the JIT compiler so that it doesn’t optimise our benchmarking code.In this tutorial, I am going to use JMH Gradle plugin to make tests.&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;Source code of this tutorial can be found at : &lt;a href=&quot;https://github.com/Gokuldroid/PrefMatters&quot;&gt;PrefMatters&lt;/a&gt;&lt;/p&gt;

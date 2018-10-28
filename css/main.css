@@ -29,7 +29,8 @@ body {
   color: #262626; }
 
 a {
-  text-decoration: none; }
+  text-decoration: none;
+  color: #008cba; }
 
 strong {
   font-weight: bold; }

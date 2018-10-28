@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+     <link rel="stylesheet" href="/css/main.css">
+     <script src="/js/jquery-3.2.1.min.js"></script>
+     <title></title>
+</head>
+
+<body>
+     <nav class="header">
+     <h2><a href="/index.html"><b>Gokul <span>| Droid</span></b></a></h2>
+     <ul>
+          <li><a href="assets/resume.pdf" download>Resume</a></li>
+          <!-- <li><a href="#">Skills</a></li> -->
+          <li><a href="/blog">Blog</a></li>
+     </ul>
+</nav>
+          <div class="post">
+	<p class="post-title">Android loggers analyzed</p>
+	<div class="post-content">
+		<p>At first you need to do some changes in logcat console. On the right top drop select <strong>Show only selected applications</strong>. This will filterout only the application we are working on it.</p>
+
+<blockquote>
+  <p>All the code samples are written in kotlin.  Source code is available at <a href="https://github.com/Gokuldroid/AndroidTutorials">Github</a></p>
+</blockquote>
+
+<p><strong>Native android logging:</strong></p>
+
+<p>Android has built in methods to do logging.</p>
+
+<p>Example,</p>
+<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kd">val</span> <span class="py">TAG</span> <span class="p">=</span> <span class="s">"Demo"</span>
+<span class="k">private</span> <span class="k">fun</span> <span class="nf">sampleLog</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">Log</span><span class="p">.</span><span class="n">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">"Hello log"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/blog/android-logger/native-logger.png" alt="native-logger" width="100%" /></p>
+
+<p>Simple! Is n’t it?. It works well for small applications. As you can see in that picture there are lot of unnecessary logs. We can filterout by the Tag name (i.e, <strong>Demo</strong> in our case).Just type the tag name in search bar.It will show only logs with that tagname.</p>
+
+<p><strong>Cons:</strong></p>
+
+<p>1.You need to define tags each time or you have to write a helper boilerplate which adds tags automatically.I don’t want to do this for all my applications , neither you.</p>
+
+<p>2.There is no string interpolation. (It is possible in kotlin, but in java you have to do it manually).</p>
+
+<p><strong>Timber from jake wharton <a href="https://github.com/JakeWharton/timber">(Github link)</a></strong></p>
+
+<p>Example,</p>
+
+<p>In MainApplicaiton</p>
+
+<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">MainApplication</span> <span class="p">:</span> <span class="n">Application</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">onCreate</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">super</span><span class="p">.</span><span class="n">onCreate</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">BuildConfig</span><span class="p">.</span><span class="n">DEBUG</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">Timber</span><span class="p">.</span><span class="n">plant</span><span class="p">(</span><span class="n">Timber</span><span class="p">.</span><span class="n">DebugTree</span><span class="p">())</span>
+        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+            <span class="n">Timber</span><span class="p">.</span><span class="n">plant</span><span class="p">(</span><span class="n">CrashlyticsTree</span><span class="p">())</span>
+        <span class="p">}</span>
+   <span class="p">}</span>
+    
+    <span class="k">inner</span> <span class="kd">class</span> <span class="nc">CrashlyticsTree</span> <span class="p">:</span> <span class="n">Timber</span><span class="p">.</span><span class="n">Tree</span><span class="p">()</span> <span class="p">{</span>
+
+        <span class="k">override</span> <span class="k">fun</span> <span class="nf">log</span><span class="p">(</span><span class="n">priority</span><span class="p">:</span> <span class="n">Int</span><span class="p">,</span><span class="n">tag</span><span class="p">:</span> <span class="n">String</span><span class="p">?,</span><span class="n">message</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Throwable</span><span class="p">?)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">priority</span> <span class="p">==</span> <span class="n">Log</span><span class="p">.</span><span class="n">VERBOSE</span> <span class="p">||</span> <span class="n">priority</span> <span class="p">==</span> <span class="n">Log</span><span class="p">.</span><span class="n">DEBUG</span> <span class="p">||</span> <span class="n">priority</span> <span class="p">==</span> <span class="n">Log</span><span class="p">.</span><span class="n">INFO</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span>
+            <span class="p">}</span>
+            <span class="c1">//Send to crash analytics here
+</span>        <span class="p">}</span>
+    <span class="p">}</span> 
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">fun</span> <span class="nf">sampleLogTimber</span><span class="p">(){</span>
+        <span class="n">Timber</span><span class="p">.</span><span class="n">d</span><span class="p">(</span><span class="s">"Hello world from %s"</span><span class="p">,</span> <span class="s">"Gokul"</span><span class="p">)</span>
+ <span class="p">}</span>
+</code></pre></div></div>
+
+<p>This will produce log like this.
+<img src="/assets/blog/android-logger/timber.png" alt="native-logger" width="100%" /></p>
+
+<p><strong>Pros:</strong></p>
+
+<p>1.We can configure the logger by the build configuration easily. All we need is to give custom Timber.Tree. Crash analytics is much easier compared to android native logger.</p>
+
+<p>2.No need to define tags again and again. Timber will automatically all the call site class name in log.We can define tags for one log if we want to.</p>
+
+<p>3.String interpolation is possible and much better stack trace compared to native logger.</p>
+
+<p>4.Rock solid base for all kind of loggers.We can extend it like the way we want or we can integrate it with any other logger easily.</p>
+
+<p><strong>Cons :</strong></p>
+
+<p>1.No Provision to logging to a file.(We can achieve via custom timver tree).</p>
+
+<p>2.No log formatting provision.</p>
+
+<p>3.Adding custom tag is painful one.</p>
+
+<p><strong>Logger from orhanobut <a href="https://github.com/orhanobut/logger">(Github link)</a></strong></p>
+
+<p>It is one of the advanced logger. It supports a lot of things like formatting, exporting logs to external storage and lot of customizations are available.</p>
+
+<p>Example,</p>
+
+<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//init logger
+</span><span class="n">Logger</span><span class="p">.</span><span class="n">addLogAdapter</span><span class="p">(</span><span class="n">new</span> <span class="n">AndroidLogAdapter</span><span class="p">());</span>
+
+<span class="n">Logger</span><span class="p">.</span><span class="n">d</span><span class="p">(</span><span class="s">"debug"</span><span class="p">);</span>
+<span class="n">Logger</span><span class="p">.</span><span class="n">e</span><span class="p">(</span><span class="s">"error"</span><span class="p">);</span>
+<span class="n">Logger</span><span class="p">.</span><span class="n">w</span><span class="p">(</span><span class="s">"warning"</span><span class="p">);</span>
+<span class="n">Logger</span><span class="p">.</span><span class="n">v</span><span class="p">(</span><span class="s">"verbose"</span><span class="p">);</span>
+<span class="n">Logger</span><span class="p">.</span><span class="n">i</span><span class="p">(</span><span class="s">"information"</span><span class="p">);</span>
+<span class="n">Logger</span><span class="p">.</span><span class="n">wtf</span><span class="p">(</span><span class="s">"What a Terrible Failure"</span><span class="p">);</span>
+
+<span class="c1">//Customizations
+</span>
+<span class="n">FormatStrategy</span> <span class="n">formatStrategy</span> <span class="p">=</span> <span class="n">PrettyFormatStrategy</span><span class="p">.</span><span class="n">newBuilder</span><span class="p">()</span>
+  <span class="p">.</span><span class="n">showThreadInfo</span><span class="p">(</span><span class="k">false</span><span class="p">)</span>  <span class="c1">// (Optional) Whether to show thread info or not. Default true
+</span>  <span class="p">.</span><span class="n">methodCount</span><span class="p">(</span><span class="m">0</span><span class="p">)</span>         <span class="c1">// (Optional) How many method line to show. Default 2
+</span>  <span class="p">.</span><span class="n">methodOffset</span><span class="p">(</span><span class="m">7</span><span class="p">)</span>        <span class="c1">// (Optional) Hides internal method calls up to offset. Default 5
+</span>  <span class="p">.</span><span class="n">logStrategy</span><span class="p">(</span><span class="n">customLog</span><span class="p">)</span> <span class="c1">// (Optional) Changes the log strategy to print out. Default LogCat
+</span>  <span class="p">.</span><span class="n">tag</span><span class="p">(</span><span class="s">"My custom tag"</span><span class="p">)</span>   <span class="c1">// (Optional) Global tag for every log. Default PRETTY_LOGGER
+</span>  <span class="p">.</span><span class="n">build</span><span class="p">();</span>
+<span class="n">Logger</span><span class="p">.</span><span class="n">addLogAdapter</span><span class="p">(</span><span class="n">new</span> <span class="n">AndroidLogAdapter</span><span class="p">(</span><span class="n">formatStrategy</span><span class="p">));</span>
+
+</code></pre></div></div>
+
+<p>This will produce output like this,</p>
+
+<p><img src="/assets/blog/android-logger/logger-orhannobut.png" alt="native-logger" width="100%" /></p>
+
+<p><strong>Pros :</strong></p>
+
+<p>1.We can add custom tags.</p>
+
+<p>2.We can jump to callsite from the console it self.</p>
+
+<p>3.We can write our own format easily.</p>
+
+<p>4.It provides all the things that timber has.</p>
+
+<p>5.Output is nicely formatted. No need to do much work to get the sample out like given in the picture.</p>
+
+<p>6.It supports external storage logging.</p>
+
+<p>7.Good documentaion.</p>
+
+<p><strong>Cons:</strong></p>
+
+<p>1.It adds two lines extra for the dashes for every log. Once you get used to that, it will be easier.</p>
+
+<p>There are plenty of loggers available in github.Certain loggers are specifically desinded for some purpose.These are general purpose loggers.</p>
+
+<p>Here is some honurable mentions,</p>
+
+<p><a href="https://github.com/promeG/XLog">XLog</a> - Method logger.</p>
+
+<p><a href="https://github.com/noties/Debug">Debug</a> - Has better IDE support.</p>
+
+<p><a href="https://github.com/inaka/galgo">Galgo</a> - On screen logger.</p>
+
+<p>Let me know the loggers which you use for android in the comment section below.</p>
+
+	</div>
+	<div id="fb-root"></div>
+<script>(function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v3.2';
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+<div class="fb-comments" data-href='https://gokuldroid.github.io' data-width="900" data-numposts="10"></div>
+<script>
+    $(".fb-comments").attr("data-href", window.location.href);
+</script>
+</div>
+     <!-- <footer>
+     <ul>
+          <li><a href="https://github.com/Gokuldroid" target="_blank"><img class="icn-github"></img></a></li>
+          <li><a href="https://play.google.com/store/apps/dev?id=6497481824038903914s" target="_blank"><img class="icn-gp"></img></a></li>
+          <li><a href="https://www.quora.com/profile/Gokul-133" target="_blank"><img class="icn-quora"></img></a></li>
+          <li><a href="https://www.facebook.com/gokul.prabhu.droid" target="_blank"><img class="icn-fb"></img></a></li>
+     </ul>
+</footer> -->
+</body>
+</html>
