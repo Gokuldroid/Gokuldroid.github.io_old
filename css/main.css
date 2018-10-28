@@ -182,7 +182,7 @@ svg:hover path {
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
     transition: 0.2s; }
     .post-list .post-list-container .post-list-title {
-      padding: 20px;
+      padding: 12px;
       background: #42b983;
       font-size: 1.5em;
       color: white; }
