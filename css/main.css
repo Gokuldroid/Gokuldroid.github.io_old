@@ -140,13 +140,13 @@ svg:hover path {
 .center-content {
   padding-top: 10%; }
   .center-content #name {
-    font-size: 100px;
+    font-size: 6em;
     text-align: center;
     margin-bottom: 20px; }
     .center-content #name span {
       color: #42b983; }
     .center-content #name .cursor {
-      font-size: 75px;
+      font-size: 1em;
       animation-name: cursor-anim;
       animation-duration: 0.8s;
       animation-direction: reverse;
@@ -158,13 +158,13 @@ svg:hover path {
     margin-left: 30%; }
   .center-content .interests {
     padding: 10px;
-    font-size: 25px;
+    font-size: 1.2em;
     text-align: center; }
     .center-content .interests span {
       color: #42b983; }
 
 .contact p {
-  font-size: 25px;
+  font-size: 1.2em;
   padding: 10px; }
 
 @keyframes cursor-anim {
@@ -209,10 +209,25 @@ svg:hover path {
       padding-bottom: 20px; }
 
 /*post end*/
+@media (max-width: 767px) {
+  body {
+    font-size: 9px; }
+
+  .center-content #name {
+    font-size: 4em; }
+    .center-content #name .cursor {
+      font-size: 0.5em; }
+  .center-content .interests {
+    font-size: 1.2em; } }
+.highlighter-rouge {
+  background-color: #272822;
+  overflow-y: scroll;
+  max-width: 100%; }
+
 .highlight pre {
   background-color: #272822;
   padding: 10px;
-  font-size: 1.0rem;
+  font-size: 1.0em;
   border-radius: 5px;
   margin-bottom: 10px; }
 
