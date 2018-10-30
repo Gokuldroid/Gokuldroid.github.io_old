@@ -160,14 +160,14 @@ svg{
 .center-content{
     padding-top: 10%;
     #name{
-        font-size: 100px;
+        font-size: 6em;
         text-align: center;
         margin-bottom: 20px;
         span{
             color: $green;
         }
         .cursor{
-            font-size: 75px;
+            font-size: 1em;
             animation-name: cursor-anim;
             animation-duration: 0.8s;
             animation-direction: reverse;
@@ -182,7 +182,7 @@ svg{
     }
     .interests{
         padding: 10px;
-        font-size: 25px;
+        font-size: 1.2em;
         text-align: center;
         span{
             color: $green;
@@ -192,7 +192,7 @@ svg{
 
 .contact{
     p{
-        font-size: 25px;
+        font-size: 1.2em;
         padding: 10px;
     }
 }
@@ -248,3 +248,20 @@ svg{
     }
 }
 /*post end*/
+
+@include respond-below(sm){
+    body{
+        font-size: 9px;
+    }
+    .center-content{
+        #name{
+            font-size: 4em;
+            .cursor{
+                font-size: 0.5em;
+            }
+        }
+        .interests{
+            font-size: 1.2em;
+        }
+    }
+}
